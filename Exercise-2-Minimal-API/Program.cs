@@ -74,7 +74,7 @@ app.MapPut("/recipes/{id}", async (Recipe recipeUpdated) =>
         recipeList.Remove(recipe);
         recipeList.Add(recipeUpdated);
         await SaveRecipes();
-        return Results.Ok(recipeList);
+        return Results.Ok();
     }
     return Results.NotFound();
 });
@@ -172,6 +172,8 @@ async void ReadOnAwake()
             categories = jsonCategoryFile;
         }
     }
+    else
+        categories = new Category(new Dictionary<string, bool>());
     
     // Read recipes if previously exists.
     if (File.Exists(recipePath))
@@ -185,5 +187,6 @@ async void ReadOnAwake()
             recipeList = jsonRecipeFile;
         }
     }
+    else recipeList = new List<Recipe>();
 }
 app.Run();
