@@ -49,15 +49,21 @@ while (true)
                 {
                     case "Add a recipe":
                         var recipeToAdd = AddRecipe(await GetRecipesAsync(), await GetCategoriesAsync());
+
+                        if (recipeToAdd is not null)
+                            await PostRecipeAsync(recipeToAdd);
+
                         break;
                     case "List recipes":
                         ListAndDisplayRecipes(await GetRecipesAsync());
                         break;
                     case "Edit a recipe":
                         var recipeToEdit = EditRecipe(await GetRecipesAsync(), await GetCategoriesAsync());
+                        if (recipeToEdit is not null)
+                            await PutRecipeAsync(recipeToEdit);
                         break;
                     case "Return":
-                        return;
+                        break;
 
                 }
             }
@@ -70,7 +76,26 @@ while (true)
         case "Categories":
             try
             {
-                AnsiConsole.MarkupLine("coming soon");
+                var categoryChoice = CategoryChoices();
+                switch (categoryChoice)
+                {
+                    case "Edit":
+                        var editedCategory = EditCategory(await GetCategoriesAsync());
+
+                        if (editedCategory is not null)
+                            await PutCategoriesAsync(editedCategory[0], editedCategory[1]);
+
+                        break;
+                    case "Add":
+                        var addedCategory = AddCategory(await GetCategoriesAsync());
+
+                        if (addedCategory is not null)
+                            await PostCategoriesAsync(addedCategory);
+
+                        break;
+                    case "Return":
+                        break;
+                }
             }
             catch
             {

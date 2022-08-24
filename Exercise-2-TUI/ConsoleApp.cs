@@ -36,6 +36,8 @@ public class UI_Helper
                 AnsiConsole.Prompt(
                     new TextPrompt<string>("[red]Press enter to go back[/]")
                         .AllowEmpty());
+
+                AnsiConsole.Clear();
             }
             else if ((recipePrompt == "Edit a recipe") && (recipeList.Count == 0))
             {
@@ -45,6 +47,8 @@ public class UI_Helper
                 AnsiConsole.Prompt(
                     new TextPrompt<string>("[red]Press enter to go back[/]")
                         .AllowEmpty());
+
+                AnsiConsole.Clear();
             }
             else if ((recipePrompt == "Add a recipe") && (categories.Categories.Count == 0))
             {
@@ -54,6 +58,8 @@ public class UI_Helper
                 AnsiConsole.Prompt(
                     new TextPrompt<string>("[red]Press enter to go back[/]")
                         .AllowEmpty());
+
+                AnsiConsole.Clear();
             }
             else break;
         }
@@ -62,7 +68,7 @@ public class UI_Helper
         return recipePrompt;
     }
 
-    public static string CategoryChoices(List<Recipe> recipeList, Category categories)
+    public static string CategoryChoices()
     {
         AnsiConsole.Clear();
         var categoryPrompt = AnsiConsole.Prompt(
@@ -311,7 +317,7 @@ public class UI_Helper
         return null;
     }
 
-    public static string? EditCategory(Category categories)
+    public static List<string>? EditCategory(Category categories)
     {
 
         var categoryList = categories.Categories.Select(categ => categ.Key).ToList();
@@ -347,7 +353,12 @@ public class UI_Helper
 
             return null;
         }
-        return editedCategory;
+        var returnCategories = new List<string>
+        {
+            categoryToEdit,
+            editedCategory
+        };
+        return returnCategories;
     }
 
     public static string? AddCategory(Category categories)
