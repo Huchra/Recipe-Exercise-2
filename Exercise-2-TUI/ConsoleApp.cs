@@ -2,14 +2,15 @@
 using System.Text;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Microsoft.Extensions.Configuration;
 
 namespace Console;
-class UI_Helper
+public class UI_Helper
 {
-    public static void RecipeChoices(List<Recipe> recipeList, Category categories)
+    public static string RecipeChoices(List<Recipe> recipeList, Category categories)
     {
         AnsiConsole.Clear();
+
+        string recipePrompt;
 
         var errorEditorListTable = new Table()
             .AddColumn("[underline][red]There are currently no recipes, please add a recipe and try again![/][/]")
@@ -26,7 +27,7 @@ class UI_Helper
             recipePrompt = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                 .Title("[yellow]What would you like to do?[/]")
-                .PageSIze(4)
+                .PageSize(4)
                 .AddChoices(new [] { "Add a recipe", "List recipes", "Edit a recipe", "Return"} 
                 ));
             if ((recipePrompt == "List recipes") && (recipeList.Count == 0))
@@ -47,22 +48,23 @@ class UI_Helper
                     new TextPrompt<string>("[red]Press enter to go back[/]")
                         .AllowEmpty());
             }
-            else if ((recipePrompt == "Add a recipe") && (categories.Category.Count == 0))
+            else if ((recipePrompt == "Add a recipe") && (categories.Categories.Count == 0))
             {
-                AnsiConsole.CLear();
+                AnsiConsole.Clear();
                 AnsiConsole.Write(errorEditorListTable);
 
                 AnsiConsole.Prompt(
                     new TextPrompt<string>("[red]Press enter to go back[/]")
                         .AllowEmpty());
             }
+            else break;
         }
         while (true);
 
-        return recipeChoice;
+        return recipePrompt;
     }
     
-    public static void CategoryChoices(List<Recipe> recipeList, Category categories)
+    public static string CategoryChoices(List<Recipe> recipeList, Category categories)
     {
         AnsiConsole.Clear();
         var categoryPrompt = AnsiConsole.Prompt(
@@ -107,7 +109,7 @@ class UI_Helper
             new SelectionPrompt<string>()
             .Title("[yellow]Recipes available: [/]")
             .PageSize(recipeList.Count)
-            .Addchoices(titles)
+            .AddChoices(titles)
         );
 
         var recipeToList = recipeList.Find(recipe => recipe.Guid == recipeMap[recipeTitle]);
@@ -135,7 +137,7 @@ class UI_Helper
 
     public static Recipe? AddRecipe(List<Recipe> recipeList, Category categories)
     {
-        var categoryList = categories.Selection(category => category.Key).ToList();
+        var categoryList = categories.Categories.Select(category => category.Key).ToList();
 
         AnsiConsole.Clear();
 
@@ -158,7 +160,8 @@ class UI_Helper
             .Required()
             .PageSize(categoryList.Count)
             .InstructionsText("[yellow]Pick the relevant categories[/]")
-            .AddChoices(categories));
+            .AddChoices(categoryList)
+            );
 
         if (recipeList.Find(recipe => recipe.Title == recipeAddTitle && recipe.Categories.All(recipeAddCategories.Contains)) == null)
         {
@@ -188,17 +191,17 @@ class UI_Helper
 
         var toEditTitles = new List<string>();
 
-        foreach (Recipe recipe in recipesList)
+        foreach (Recipe recipe in recipeList)
             toEditTitles.Add(recipe.Title);
 
         var recipeToEditTitle = AnsiConsole.Ask<string>("[yellow]Enter name of recipe to edit[/]");
-        var recipeCategories = categories.Select(categ => categ.Key).ToList();
-        var matchingRecipes = recipesList;
+        var recipeCategories = categories.Categories.Select(categ => categ.Key).ToList();
+        var matchingRecipes = recipeList;
         var matchingCategories = new Dictionary<List<string>, Guid>();
         var categoryList = new List<string>();
         var categBuilder = new StringBuilder();
 
-        matchingCategories = recipeList.FindAll(recipe => recipe.Title == recipeToEditTitle);
+        matchingCategories = matchingRecipes.ToDictionary(recipe => recipe.Categories, recipe => recipe.Guid);
 
         foreach (var categList in matchingCategories.Keys.ToList())
         {
@@ -250,7 +253,7 @@ class UI_Helper
                 AnsiConsole.Clear();
                 string recipeEditInstructions = AnsiConsole.Ask<string>("[yellow]Please enter recipe ingredients, seperated by comma (, ): [/]");
                 List<string> rInstructions = recipeEditInstructions.Split(", ").ToList();
-                result.EditRecipeIngredients(rIngredients);
+                result.EditRecipeIngredients(rInstructions);
                 break;
             case "Categories":
                 var rCategoryPrompt = AnsiConsole.Prompt(

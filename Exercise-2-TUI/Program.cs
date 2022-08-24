@@ -1,7 +1,10 @@
+using Spectre.Console;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
 using Console;
+using static Console.UI_Helper;
 
 IConfigurationBuilder builder = new ConfigurationBuilder()
                     .SetBasePath(Directory.GetCurrentDirectory())
@@ -10,7 +13,7 @@ IConfigurationBuilder builder = new ConfigurationBuilder()
 var config = builder.Build();
 
 HttpClient client = new();
-client.BaseAddress = new Uri(configuration["BaseUrl"]);
+client.BaseAddress = new Uri(config["BaseUrl"]);
 client.DefaultRequestHeaders.Accept.Clear();
 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -46,10 +49,13 @@ while (true)
                 {
                     case "Add a recipe":
                         var recipeToAdd = AddRecipe(await GetRecipesAsync(), await GetCategoriesAsync());
+                        break;
                     case "List recipes":
                         ListAndDisplayRecipes(await GetRecipesAsync());
+                        break;
                     case "Edit a recipe":
                         var recipeToEdit = EditRecipe(await GetRecipesAsync(), await GetCategoriesAsync());
+                        break;
                     case "Return":
                         return;
 
@@ -78,7 +84,7 @@ while (true)
 
 async Task<List<Recipe>> GetRecipesAsync()
 {
-    recipeList = await client.GetFromJsonAsync<List<Recipe>>("recipes");
+    var recipeList = await client.GetFromJsonAsync<List<Recipe>>("recipes");
     if (recipeList != null)
         return recipeList;
 
@@ -87,26 +93,30 @@ async Task<List<Recipe>> GetRecipesAsync()
 
 async Task PostRecipeAsync(Recipe recipe)
 {
-    var response = await client.PostAsJsonAsync("recipes", Recipe);
+    var response = await client.PostAsJsonAsync("recipes", recipe);
     response.EnsureSuccessStatusCode();
 }
 
 async Task DeleteRecipeAsync(Guid id)
 {
-    var response = await client.DeleteFromJsonAsync("recipes/{id}", Guid);
+    var response = await client.DeleteAsync($"recipes/{id}");
     response.EnsureSuccessStatusCode();
 }
 
 async Task PutRecipeAsync(Recipe recipe)
 {
-    var response = await client.PutAsJsonAsync("recipes/{recipe.Guid}", Recipe);
+    var response = await client.PutAsJsonAsync("recipes/{recipe.Guid}", recipe);
     response.EnsureSuccessStatusCode();
 }
 
-async Task GetCategoriesAsync()
+async Task<Category> GetCategoriesAsync()
 {
-    var response = await client.GetFromJsonAsync("categories", Category);
-    response.EnsureSuccessStatusCode();
+    var response = await client.GetFromJsonAsync<Category>("categories");
+
+    if (response == null)
+        return new Category(new Dictionary<string, bool>());
+
+    return response;
 }
 
 async Task PostCategoriesAsync(string category)
@@ -117,12 +127,12 @@ async Task PostCategoriesAsync(string category)
 
 async Task PutCategoriesAsync(string categoryToUpdate, string categoryUpdated)
 {
-    var response = await client.PutAsJsonAsync("categories/{categoryToUpdate}?categoryUpdated={categoryUpdated}", null);
+    var response = await client.PutAsync($"categories/{categoryToUpdate}?categoryUpdated={categoryUpdated}", null);
     response.EnsureSuccessStatusCode();
 }
 
 async Task DeleteCategoriesAsync(string category)
 {
-    var response = await client.DeleteFromJsonAsync("categories/{category}", category);
+    var response = await client.DeleteAsync($"categories/{category}");
     response.EnsureSuccessStatusCode();
 }
