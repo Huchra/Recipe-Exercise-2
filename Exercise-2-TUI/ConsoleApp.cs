@@ -1,7 +1,5 @@
 ﻿using Spectre.Console;
 using System.Text;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
 
 namespace Console;
 public class UI_Helper
