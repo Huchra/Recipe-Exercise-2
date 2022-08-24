@@ -31,7 +31,7 @@ public class UI_Helper
             if ((recipePrompt == "List recipes") && (recipeList.Count == 0))
             {
                 AnsiConsole.Clear();
-                AnsiConsole.Write(errorAddTable);
+                AnsiConsole.Write(errorEditorListTable);
 
                 AnsiConsole.Prompt(
                     new TextPrompt<string>("[red]Press enter to go back[/]")
@@ -53,7 +53,7 @@ public class UI_Helper
             else if ((recipePrompt == "Add a recipe") && (categories.Categories.Count == 0))
             {
                 AnsiConsole.Clear();
-                AnsiConsole.Write(errorEditorListTable);
+                AnsiConsole.Write(errorAddTable);
 
                 AnsiConsole.Prompt(
                     new TextPrompt<string>("[red]Press enter to go back[/]")
@@ -73,7 +73,7 @@ public class UI_Helper
         AnsiConsole.Clear();
         var categoryPrompt = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
-            .Title("[yellow]Would you like to edit or add categories?[/")
+            .Title("[yellow]Would you like to edit or add categories?[/]")
             .PageSize(3)
             .AddChoices(new[] { "Edit", "Add", "Return" }
             ));
@@ -112,7 +112,7 @@ public class UI_Helper
         string recipeTitle = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
             .Title("[yellow]Recipes available: [/]")
-            .PageSize(recipeList.Count)
+            .PageSize(recipeList.Capacity)
             .AddChoices(titles)
         );
 
@@ -162,7 +162,7 @@ public class UI_Helper
             new MultiSelectionPrompt<string>()
             .Title("Please pick categories")
             .Required()
-            .PageSize(categoryList.Count)
+            .PageSize(categoryList.Capacity)
             .InstructionsText("[yellow]Pick the relevant categories[/]")
             .AddChoices(categoryList)
             );
@@ -223,7 +223,7 @@ public class UI_Helper
             new MultiSelectionPrompt<string>()
             .Title("Please pick categories the recipe belongs to")
             .Required()
-            .PageSize(categoryList.Count)
+            .PageSize(categoryList.Capacity)
             .InstructionsText("[yellow]Pick the relevant categories[/]")
             .AddChoices(categoryList)
         );
@@ -262,6 +262,15 @@ public class UI_Helper
                 result.EditRecipeIngredients(rInstructions);
 
                 return result;
+
+            case "Ingredients":
+                AnsiConsole.Clear();
+                string recipeEditIngredients = AnsiConsole.Ask<string>("[yellow]Please enter recipe instructions, seperated by comma: [/]");
+                List<string> rIngredients = recipeEditIngredients.Split(", ").ToList();
+                result.EditRecipeIngredients(rIngredients);
+
+                return result;
+
             case "Categories":
                 var rCategoryPrompt = AnsiConsole.Prompt(
                     new SelectionPrompt<string>()
@@ -288,7 +297,7 @@ public class UI_Helper
                                 new MultiSelectionPrompt<string>()
                                 .Title("Please pick categories the recipe belongs to")
                                 .Required()
-                                .PageSize(categoryList.Count)
+                                .PageSize(categoryList.Capacity)
                                 .InstructionsText("[yellow]Pick the categories you want to remove from the recipe[/]")
                                 .AddChoices(result.Categories)
                             );
@@ -301,7 +310,7 @@ public class UI_Helper
                             new MultiSelectionPrompt<string>()
                             .Title("Please pick categories the recipe belongs to")
                             .Required()
-                            .PageSize(categoryList.Count)
+                            .PageSize(categoryList.Capacity)
                             .InstructionsText("[yellow]Pick relevant categories[/]")
                             .AddChoices(recipeCategories)
                         );
@@ -336,7 +345,7 @@ public class UI_Helper
         var categoryToEdit = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
             .Title("Please pick category to edit")
-            .PageSize(categoryList.Count)
+            .PageSize(categoryList.Capacity)
             .AddChoices(categoryList)
         );
 

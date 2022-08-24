@@ -59,8 +59,10 @@ while (true)
                         break;
                     case "Edit a recipe":
                         var recipeToEdit = EditRecipe(await GetRecipesAsync(), await GetCategoriesAsync());
+
                         if (recipeToEdit is not null)
                             await PutRecipeAsync(recipeToEdit);
+
                         break;
                     case "Return":
                         break;
@@ -105,8 +107,6 @@ while (true)
     }
 }
 
-
-
 async Task<List<Recipe>> GetRecipesAsync()
 {
     var recipeList = await client.GetFromJsonAsync<List<Recipe>>("recipes");
@@ -130,7 +130,7 @@ async Task DeleteRecipeAsync(Guid id)
 
 async Task PutRecipeAsync(Recipe recipe)
 {
-    var response = await client.PutAsJsonAsync("recipes/{recipe.Guid}", recipe);
+    var response = await client.PutAsJsonAsync($"recipes/{recipe.Guid}", recipe);
     response.EnsureSuccessStatusCode();
 }
 
