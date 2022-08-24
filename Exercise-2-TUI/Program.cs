@@ -8,7 +8,7 @@ using static Console.UI_Helper;
 
 IConfigurationBuilder builder = new ConfigurationBuilder()
                     .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.Developlment.josn");
+                    .AddJsonFile("appsettings.Development.json");
 
 var config = builder.Build();
 
@@ -31,7 +31,7 @@ while (true)
     var recCatChoice = AnsiConsole.Prompt(
         new SelectionPrompt<string>()
         .Title("[yellow]How can we serve you today?[/]")
-        .PageSize(10)
+        .PageSize(3)
         .AddChoices(new[] { "Categories", "Recipes", "Exit" }
         ));
 
@@ -70,7 +70,7 @@ while (true)
         case "Categories":
             try
             {
-
+                AnsiConsole.MarkupLine("coming soon");
             }
             catch
             {

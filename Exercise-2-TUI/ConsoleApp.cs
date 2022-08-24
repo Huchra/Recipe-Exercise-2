@@ -21,14 +21,14 @@ public class UI_Helper
             .AddColumn("[underline][red]There are currently no categories, please add categories and try again![/][/]")
             .Centered()
             .Expand();
-        
-        do 
+
+        do
         {
             recipePrompt = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                 .Title("[yellow]What would you like to do?[/]")
                 .PageSize(4)
-                .AddChoices(new [] { "Add a recipe", "List recipes", "Edit a recipe", "Return"} 
+                .AddChoices(new[] { "Add a recipe", "List recipes", "Edit a recipe", "Return" }
                 ));
             if ((recipePrompt == "List recipes") && (recipeList.Count == 0))
             {
@@ -63,7 +63,7 @@ public class UI_Helper
 
         return recipePrompt;
     }
-    
+
     public static string CategoryChoices(List<Recipe> recipeList, Category categories)
     {
         AnsiConsole.Clear();
@@ -71,7 +71,7 @@ public class UI_Helper
             new SelectionPrompt<string>()
             .Title("[yellow]Would you like to edit or add categories?[/")
             .PageSize(3)
-            .AddChoices(new[] {"Edit","Add", "Return"}
+            .AddChoices(new[] { "Edit", "Add", "Return" }
             ));
 
         return categoryPrompt;
@@ -220,7 +220,7 @@ public class UI_Helper
             .Title("Please pick categories the recipe belongs to")
             .Required()
             .PageSize(categoryList.Count)
-            .InstructionText("[yellow]Pick the relevant categories[/]")
+            .InstructionsText("[yellow]Pick the relevant categories[/]")
             .AddChoices(categoryList)
         );
 
@@ -233,11 +233,13 @@ public class UI_Helper
                 .AddColumn("[red]No recipe exists with these search conditions[/]")
                 .Centered()
                 .Expand();
-            
+
             AnsiConsole.Write(recipeListError);
-             AnsiConsole.Prompt(
-                            new TextPrompt<string>("[red]Press Enter to go back...[/]")
-                            .AllowEmpty());
+            AnsiConsole.Prompt(
+                           new TextPrompt<string>("[red]Press Enter to go back...[/]")
+                           .AllowEmpty());
+
+            return null;
         }
 
         var toEdit = AnsiConsole.Prompt(
@@ -254,7 +256,8 @@ public class UI_Helper
                 string recipeEditInstructions = AnsiConsole.Ask<string>("[yellow]Please enter recipe ingredients, seperated by comma (, ): [/]");
                 List<string> rInstructions = recipeEditInstructions.Split(", ").ToList();
                 result.EditRecipeIngredients(rInstructions);
-                break;
+
+                return result;
             case "Categories":
                 var rCategoryPrompt = AnsiConsole.Prompt(
                     new SelectionPrompt<string>()
@@ -281,7 +284,7 @@ public class UI_Helper
                                 new MultiSelectionPrompt<string>()
                                 .Title("Please pick categories the recipe belongs to")
                                 .Required()
-                                .PageSize(categoryList)
+                                .PageSize(categoryList.Count)
                                 .InstructionsText("[yellow]Pick the categories you want to remove from the recipe[/]")
                                 .AddChoices(result.Categories)
                             );
@@ -294,7 +297,7 @@ public class UI_Helper
                             new MultiSelectionPrompt<string>()
                             .Title("Please pick categories the recipe belongs to")
                             .Required()
-                            .PageSize(categoryList)
+                            .PageSize(categoryList.Count)
                             .InstructionsText("[yellow]Pick relevant categories[/]")
                             .AddChoices(recipeCategories)
                         );
@@ -304,9 +307,10 @@ public class UI_Helper
                 }
                 break;
 
-                case "Return":
-                    return;
+            case "Return":
+                return null;
         }
+        return null;
     }
 
     public static string? EditCategory(Category categories)
@@ -317,18 +321,18 @@ public class UI_Helper
         if (categoryList.Count == 0)
         {
             AnsiConsole.Clear();
-            
+
             var editCategoryError = new Table()
                 .AddColumn("[red]Please enter a category first[/]")
                 .Centered();
-        
-        return null;
+
+            return null;
         }
 
         var categoryToEdit = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
             .Title("Please pick category to edit")
-            .PageSIze(categoryList.Count)
+            .PageSize(categoryList.Count)
             .AddChoices(categoryList)
         );
 
@@ -350,32 +354,32 @@ public class UI_Helper
 
     public static string? AddCategory(Category categories)
     {
-       AnsiConsole.Clear();
+        AnsiConsole.Clear();
 
-       string categoryToAdd = AnsiConsole.Ask<string>("[yellow]Enter category name to add: [/]");
-       ArgumentNullException.ThrowIfNull(categoryToAdd);
+        string categoryToAdd = AnsiConsole.Ask<string>("[yellow]Enter category name to add: [/]");
+        ArgumentNullException.ThrowIfNull(categoryToAdd);
 
-       if (categories.Categories.ContainsKey(categoryToAdd))
-       {
-           var errAddTable = new Table()
-                .AddColumn("[underline][red]Category already exists.[/][/]")
-                .Centered()
-                .Expand();
+        if (categories.Categories.ContainsKey(categoryToAdd))
+        {
+            var errAddTable = new Table()
+                 .AddColumn("[underline][red]Category already exists.[/][/]")
+                 .Centered()
+                 .Expand();
             AnsiConsole.Write(errAddTable);
             AnsiConsole.Prompt(
                 new TextPrompt<string>("[red]Press Enter to go back ... [/]")
                 .AllowEmpty());
 
-        return null;     
-       }
-       else
-       {
-           AnsiConsole.Prompt(
-               new TextPrompt<string>("[yellow]Added successfully. Press Enter to go back...[/]")
-               .AllowEmpty());
-            
+            return null;
+        }
+        else
+        {
+            AnsiConsole.Prompt(
+                new TextPrompt<string>("[yellow]Added successfully. Press Enter to go back...[/]")
+                .AllowEmpty());
+
             return categoryToAdd;
-       }
+        }
     }
 
 }
